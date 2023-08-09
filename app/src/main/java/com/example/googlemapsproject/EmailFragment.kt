@@ -50,14 +50,13 @@ class EmailFragment : Fragment() {
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
                 var latLng = LatLng(location.latitude, location.longitude)
-                // Use the latLng for your map operations
                 latLon = latLng.toString()
             }
         }
 
         sendBtn.setOnClickListener {
             val email = emailED.text.toString()
-
+            val latLon = "Latitude: 43.6532, Longitude: 79.3832"
             val intent = Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:")
                 putExtra(Intent.EXTRA_EMAIL,email)

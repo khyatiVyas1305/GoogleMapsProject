@@ -1,5 +1,7 @@
 package com.example.googlemapsproject
 
+import android.Manifest
+import android.app.Activity
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
@@ -8,6 +10,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat.getCurrentLocation
 import com.android.volley.BuildConfig
@@ -59,16 +62,34 @@ class GoogleMapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(map: GoogleMap) {
 
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            ActivityCompat.requestPermissions(requireContext() as Activity,arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), 100)
+            return
+        }
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
+
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                var latLng = LatLng(location.latitude, location.longitude)
+                map.addMarker(
+                    MarkerOptions()
+                        .position(latLng)
+                        .title("Marker in Toronto")
+                )
+                map.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+                latLon = latLng.toString()
+            }
+
+        }
         //googleMap = map
-        val toronto = LatLng(43.6532, 79.3832)
-        map.addMarker(
-            MarkerOptions()
-                .position(toronto)
-                .title("Marker in Toronto")
-        )
-        // [START_EXCLUDE silent]
-        map.moveCamera(CameraUpdateFactory.newLatLng(toronto))
-        // Customize and work with the GoogleMap object here
+        //val toronto = LatLng(51.2538, -85.3232)
+//        map.addMarker(
+//            MarkerOptions()
+//                .position(toronto)
+//                .title("Marker in Toronto")
+//        )
+//        map.moveCamera(CameraUpdateFactory.newLatLng(toronto))
     }
 
     override fun onCreateView(
